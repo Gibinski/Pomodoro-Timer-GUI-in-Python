@@ -22,9 +22,9 @@ class PomodoroTimer:
         self.tab2 = ttk.Frame(self.tabs, width=600, height=100)
         self.tab3 = ttk.Frame(self.tabs, width=600, height=100)
 
-        self.tabs.add(self.tab1, text="Pomodor")
-        self.tabs.add(self.tab2, text="Short breal")
-        self.tabs.add(self.tab3, text="Long breal")
+        self.tabs.add(self.tab1, text="Pomodoro")
+        self.tabs.add(self.tab2, text="Short break")
+        self.tabs.add(self.tab3, text="Long break")
 
         self.pomodoro_timer_label = ttk.Label(self.tab1, text="25:00", font=("Ubuntu", 48))
         self.pomodoro_timer_label.pack(pady=20)
