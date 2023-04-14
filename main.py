@@ -2,14 +2,19 @@ import time
 import threading
 import tkinter as tk
 from tkinter import ttk, PhotoImage
+import pygame
+
 
 class PomodoroTimer:
     
     def __init__(self):
+        pygame.mixer.init()# initialise the pygame
+  
         self.root = tk.Tk()
         self.root.geometry("600x300")
         self.root.title("Pomodoro Timer")
         self.root.tk.call('wm', 'iconphoto', self.root._w, PhotoImage(file="tomato.png"))
+        self.root["bg"] = "#333"
 
         self.s = ttk.Style()
         self.s.configure("TNotebook.Tab", font=("Ubintu", 16))
@@ -26,13 +31,13 @@ class PomodoroTimer:
         self.tabs.add(self.tab2, text="Short break")
         self.tabs.add(self.tab3, text="Long break")
 
-        self.pomodoro_timer_label = ttk.Label(self.tab1, text="25:00", font=("Ubuntu", 48))
+        self.pomodoro_timer_label = ttk.Label(self.tab1, text="work 25:00", font=("Ubuntu", 48), background="indian red")
         self.pomodoro_timer_label.pack(pady=20)
 
-        self.short_break_timer_label = ttk.Label(self.tab2, text="05:00", font=("Ubuntu", 48))
+        self.short_break_timer_label = ttk.Label(self.tab2, text="break 05:00", font=("Ubuntu", 48), background="yellow")
         self.short_break_timer_label.pack(pady=20)
 
-        self.long_break_timer_label = ttk.Label(self.tab3, text="15:00", font=("Ubuntu", 48))
+        self.long_break_timer_label = ttk.Label(self.tab3, text="rest 35:00", font=("Ubuntu", 48), background="light green")
         self.long_break_timer_label.pack(pady=20)
 
         self.grid_layiut = ttk.Frame(self.root)
@@ -56,6 +61,10 @@ class PomodoroTimer:
         self.running = False
 
         self.root.mainloop()
+    
+    def play(self, path):
+        pygame.mixer.music.load(path)
+        pygame.mixer.music.play(loops=0)
 
     def start_timer_thread(self):
         if not self.running:
@@ -69,26 +78,28 @@ class PomodoroTimer:
         timer_id = self.tabs.index(self.tabs.select()) + 1
 
         if timer_id == 1:
+            self.play("work.mp3")
             full_seconds = 60 * 25
             while full_seconds > 0 and not self.stopped:
                 minutes, seconds = divmod(full_seconds, 60)
-                self.pomodoro_timer_label.config(text=f"{minutes:02d}:{seconds:02d}")
+                self.pomodoro_timer_label.config(text=f"work {minutes:02d}:{seconds:02d}")
                 self.root.update()
                 time.sleep(1)
                 full_seconds -= 1
             if not self.stopped or self.skipped:
                 self.pomodoros += 1
                 self.pomodoro_counter_label.config(text=f"Pomodoeos: {self.pomodoros}")
-                if self.pomodoros % 4 == 0:
+                if self.pomodoros % 5 == 0:
                     self.tabs.select(2)
                 else:
                     self.tabs.select(1)
                 self.start_timer()
         elif timer_id == 2:
+            self.play("break.mp3")
             full_seconds = 60 * 5
             while full_seconds > 0 and not self.stopped:
                 minutes, seconds = divmod(full_seconds, 60)
-                self.short_break_timer_label.config(text=f"{minutes:02d}:{seconds:02d}")
+                self.short_break_timer_label.config(text=f"break {minutes:02d}:{seconds:02d}")
                 self.root.update()
                 time.sleep(1)
                 full_seconds -= 1
@@ -96,10 +107,11 @@ class PomodoroTimer:
                 self.tabs.select(0)
                 self.start_timer()
         elif timer_id == 3:
-            full_seconds = 60 * 15
+            self.play("rest.mp3")
+            full_seconds = 60 * 35
             while full_seconds > 0 and not self.stopped:
                 minutes, seconds = divmod(full_seconds, 60)
-                self.long_break_timer_label.config(text=f"{minutes:02d}:{seconds:02d}")
+                self.long_break_timer_label.config(text=f"rest {minutes:02d}:{seconds:02d}")
                 self.root.update()
                 time.sleep(1)
                 full_seconds -= 1
@@ -113,20 +125,20 @@ class PomodoroTimer:
         self.stopped = True
         self.skipped = False
         self.pomodoros = 0
-        self.pomodoro_timer_label.config(text=f"25:00")
-        self.short_break_timer_label.config(text=f"05:00")
-        self.long_break_timer_label.config(text=f"15:00")
+        self.pomodoro_timer_label.config(text=f"work 25:00")
+        self.short_break_timer_label.config(text=f"bewak 05:00")
+        self.long_break_timer_label.config(text=f"rest 30:00")
         self.pomodoro_counter_label.config(text=f"Pomodoeos: 0")
         self.running = False
 
     def skip_clock(self):
         current_tab = self.tabs.index(self.tabs.select())
         if current_tab == 0:
-            self.pomodoro_timer_label.config(text=f"25:00")
+            self.pomodoro_timer_label.config(text=f"work 25:00")
         elif current_tab == 1:
-            self.short_break_timer_label.config(text=f"05:00")
+            self.short_break_timer_label.config(text=f"break 05:00")
         elif current_tab == 2:
-            self.long_break_timer_label.config(text=f"15:00")
+            self.long_break_timer_label.config(text=f"rest 35:00")
 
         self.skipped = True
         self.stopped = True
